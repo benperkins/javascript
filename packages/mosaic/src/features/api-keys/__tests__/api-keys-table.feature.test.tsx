@@ -173,6 +173,23 @@ describe('APIKeysTable', () => {
       expect(within(table()).getAllByRole('row')).toHaveLength(3);
     });
 
+    it('keeps its column widths when the first page arrives', async () => {
+      serveFapi(signedIn());
+      const list = holdRequests('get', '/api_keys');
+      await renderWithClerk(<APIKeysTable subject={alice.id} />);
+      await screen.findByRole('status');
+      const columnWidths = () =>
+        within(table())
+          .getAllByRole('columnheader')
+          .map(header => header.getBoundingClientRect().width);
+      const loadingWidths = columnWidths();
+
+      list.release();
+      await within(table()).findByText('Web app');
+
+      expect(columnWidths()).toEqual(loadingWidths);
+    });
+
     it('explains when the user has no keys', async () => {
       await renderTable(signedIn([]));
 
