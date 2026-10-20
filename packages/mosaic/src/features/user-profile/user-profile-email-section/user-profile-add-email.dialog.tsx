@@ -15,6 +15,8 @@ import { Item } from '../../../components/item';
 import { Otp } from '../../../components/otp';
 import { Text } from '../../../components/text';
 import { fill, rich, useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
+import { Reverification } from '../../reverification';
 import { styles as panelStyles } from '../user-profile-profile-panel.styles';
 
 const styles = stylex.create({
@@ -28,7 +30,8 @@ export interface UserProfileAddEmailDialogProps {
   onOpenChange: (open: boolean) => void;
   handle?: DialogHandle<unknown>;
   finalFocus?: DialogFocusTarget;
-  step: 'email' | 'verify' | 'link' | 'sso';
+  step: 'email' | 'reverify' | 'verify' | 'link' | 'sso';
+  reverification?: ReverificationController;
   emailAddress: string;
   onEmailAddressChange: (value: string) => void;
   canSubmitEmail?: boolean;
@@ -52,6 +55,8 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
       handle={props.handle}
       open={props.open}
       onOpenChange={props.onOpenChange}
+      shouldCloseOnInteractOutside={props.step !== 'reverify'}
+      showCloseButton={props.step !== 'reverify' || Boolean(props.reverification?.onCancel)}
     >
       <Dialog.Popup
         variant='card'
@@ -78,6 +83,14 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                     isPending={current.isPending}
                     errorMessage={current.errorMessage}
                   />
+                </Flow.Step>
+                <Flow.Step ids={['reverify']}>
+                  {current.reverification ? (
+                    <Reverification
+                      controller={current.reverification}
+                      onClose={() => current.onOpenChange(false)}
+                    />
+                  ) : null}
                 </Flow.Step>
                 <Flow.Step ids={['link']}>
                   <VerifyLinkStep
