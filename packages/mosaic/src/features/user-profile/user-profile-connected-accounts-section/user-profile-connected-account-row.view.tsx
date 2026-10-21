@@ -51,11 +51,13 @@ export function UserProfileConnectProviderRowView({
   isPending,
   isDisabled,
   onConnect,
+  triggerRef,
 }: {
   provider: UserProfileConnectionProvider;
   isPending: boolean;
   isDisabled: boolean;
   onConnect: (id: string) => void;
+  triggerRef?: Ref<HTMLButtonElement>;
 }) {
   const m = useMessages('userProfileConnectedAccounts');
   return (
@@ -74,6 +76,7 @@ export function UserProfileConnectProviderRowView({
         </Section.Content>
         <Section.Actions>
           <SubmitButton
+            ref={triggerRef}
             type='button'
             size='sm'
             variant='outline'
